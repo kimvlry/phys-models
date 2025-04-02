@@ -1,0 +1,46 @@
+name: Deploy PDFs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build PDF for 3/report
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: "src/3. Newton's rings/report3.tex"
+
+      - name: Build PDF for 4/report
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: "src/4. Connected pendulum/report4.tex"
+
+      - name: Move PDFs to output folder
+        run: |
+          mkdir -p compiled-pdfs
+          mv report3.pdf compiled-pdfs/3.pdf 
+          mv report4.pdf compiled-pdfs/4.pdf 
+
+      - name: Upload PDFs as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-pdfs
+          path: compiled-pdfs/
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          clean: true
+          folder: compiled-pdfs
+          target-folder: pdfs
