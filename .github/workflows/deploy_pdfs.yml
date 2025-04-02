@@ -17,12 +17,12 @@ jobs:
       - name: Build PDF for 3/report
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: "src/3. Newton's rings/report3.tex"
+          root_file: "3. Newton's rings/report3.tex"
 
       - name: Build PDF for 4/report
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: "src/4. Connected pendulum/report4.tex"
+          root_file: "4. Connected pendulum/report4.tex"
 
       - name: Move PDFs to output folder
         run: |
