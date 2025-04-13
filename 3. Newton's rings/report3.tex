@@ -213,24 +213,19 @@
     \end{itemize}
 
 
-    \section{Моделирование}
+% -------------------------
+
+\section{Моделирование}
     В данном разделе описывается структура программы, реализующей моделирование колец Ньютона
 
     \subsection{Пользовательский интерфейс и настройка параметров}
     В этой части кода реализован графический интерфейс пользователя на базе \texttt{Tkinter}.
-    Интерфейс содержит следующие элементы:
+    Интерфейс позволяет задать следующие параметры:
     \begin{itemize}
-        \item Поля ввода для задания параметров модели:
-        \begin{itemize}
             \item Радиус кривизны \( R \) (м).
             \item Центральная длина волны \( \lambda_0 \) (нм), которая затем переводится в метры.
             \item Ширина спектра \(\Delta \lambda\) (нм), также переводимая в метры.
-        \end{itemize}
-        \item Кнопка для обновления изображения модели.
-        \item Виджет для отображения результирующего интерференционного рисунка.
     \end{itemize}
-
-%\lstinputlisting[language=Python, caption={Код пользовательского интерфейса и параметров}]{path/to/interface_code.py}
 
     \subsection{Расчёт интенсивности}
     Программа рассчитывает интенсивность интерференционной картины в зависимости от радиальной координаты \( r \).
@@ -249,6 +244,11 @@
         что нормирует интенсивность в диапазон [0, 1]. Такой выбор удобен для визуализации, так как после масштабирования
         (например, перемножением на 255) можно получить корректное 8-битное изображение, где 0 соответствует полной
         темноте, а 255 --- максимальной яркости.
+
+        \begin{lstlisting}[language=Python]
+        def intensity_mono(self, r, wavelength):
+            return 0.5 * (1 - np.cos(2 * np.pi * r ** 2 / (wavelength * self.R)))
+        \end{lstlisting}
 
         \item{\textbf{Квазимонохроматический случай. Усреднение с использованием спектральной плотности}}
         При квазимонохроматическом освещении свет рассматривается как диапазон длин волн
@@ -277,16 +277,41 @@
         \[
         w_i = \frac{S(\lambda_i)}{\sum_{j=1}^{20} S(\lambda_j)}.
         \]
+
+        \begin{lstlisting}[language=Python]
+        def spectral_density(self, wavelength):
+            sigma = self.delta_lambda / (2 * np.sqrt(2 * np.log(2)))
+            return np.exp(-((wavelength - self.lambda0) ** 2) / (2 * sigma ** 2))
+        
+        def intensity_quasi(self, r):
+            wavelengths = np.linspace(self.lambda0 - self.delta_lambda / 2,
+                                      self.lambda0 + self.delta_lambda / 2, 20)
+            total = np.zeros_like(r)
+            weights = np.zeros_like(wavelengths)
+            for i, wl in enumerate(wavelengths):
+                    weights[i] = self.spectral_density(wl)
+            # normalising
+            weights /= np.sum(weights)
+        
+            for wl, weight in zip(wavelengths, weights):
+                total += weight * self.intensity_mono(r, wl)
+            return total
+        \end{lstlisting}
+
     \end{itemize}
 
-%\lstinputlisting[language=Python, caption={Код расчёта интенсивности}]{path/to/intensity_code.py}
 
     \subsection{Построение двумерного поля интенсивности}
     Для визуализации интерференционной картины создаётся двумерная координатная сетка, где интенсивность \( I(x,y) \)
     определяется как функция \( I\left(\sqrt{x^2+y^2}\right) \). Это соответствует преобразованию теоретической
     зависимости \( I(r) \) в изображение, что позволяет получить кольцевую структуру модели.
 
-%\lstinputlisting[language=Python, caption={Код построения двумерной координатной сетки}]{path/to/meshgrid_code.py}
+    \begin{lstlisting}[language=Python]
+        x = np.linspace(-0.01, 0.01, self.size)
+        y = np.linspace(-0.01, 0.01, self.size)
+        xx, yy = np.meshgrid(x, y)
+        r = np.sqrt(xx ** 2 + yy ** 2)
+    \end{lstlisting}
 
     \subsection{Преобразование интенсивности в изображение и цветовое отображение}
     После расчёта интенсивности выполняется нормировка и преобразование полученных значений в изображение:
@@ -296,6 +321,10 @@
         которая приближённо преобразует длину волны в соответствующий RGB-цвет. Это упрощение сделано
         для наглядного отображения спектральных характеристик, так как теория не диктует конкретный
         алгоритм преобразования спектра в цвет.
+
+        % \begin{lstlisting}[language=Python]
+
+        % \end{lstlisting}
     \end{itemize}
 
 %\lstinputlisting[language=Python, caption={Код преобразования интенсивности в изображение}]{path/to/image_conversion_code.py}
