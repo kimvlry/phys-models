@@ -76,7 +76,6 @@ class NewtonRingsApp:
 
     def wavelength_to_rgb(self, wavelength):
         """Приблизительное преобразование длины волны в RGB"""
-        gamma = 0.8
         if wavelength < 380e-9:
             return (0, 0, 0)
         elif wavelength < 440e-9:
