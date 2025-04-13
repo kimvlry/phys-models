@@ -53,14 +53,26 @@ class NewtonRingsApp:
         """Интенсивность для монохроматического света"""
         return 0.5 * (1 - np.cos(2 * np.pi * r ** 2 / (wavelength * self.R)))
 
+    # Вычисление спектральной плотности для каждой дискретной точки
+    def spectral_density(self, wavelength):
+        sigma = self.delta_lambda / (2 * np.sqrt(2 * np.log(2)))
+        return np.exp(-((wavelength - self.lambda0) ** 2) / (2 * sigma ** 2))
+
     def intensity_quasi(self, r):
-        """Интенсивность для квазимонохроматического света"""
         wavelengths = np.linspace(self.lambda0 - self.delta_lambda / 2,
                                   self.lambda0 + self.delta_lambda / 2, 20)
         total = np.zeros_like(r)
-        for wl in wavelengths:
-            total += self.intensity_mono(r, wl)
-        return total / len(wavelengths)
+        weights = np.zeros_like(wavelengths)
+        # Вычисление вклада каждой длины волны
+        for i, wl in enumerate(wavelengths):
+            weights[i] = self.spectral_density(wl)
+        # Нормировка весов так, чтобы их сумма была равна 1
+        # (чтобы итоговое усреднение не зависело от количества дискретных точек)
+        weights /= np.sum(weights)
+
+        for wl, weight in zip(wavelengths, weights):
+            total += weight * self.intensity_mono(r, wl)
+        return total
 
     def wavelength_to_rgb(self, wavelength):
         """Приблизительное преобразование длины волны в RGB"""
