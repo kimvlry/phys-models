@@ -45,6 +45,11 @@
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
+\lstdefinelanguage{MyPython}{
+  language=Python,
+  morekeywords={np, plt, self, cos, sin},
+  sensitive=true,
+}
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen},
@@ -61,7 +66,8 @@
     showspaces=false,
     showstringspaces=false,
     showtabs=false,
-    tabsize=2
+    tabsize=2,
+    columns=fullflexible,
 }
 
 \lstset{style=mystyle}
@@ -212,10 +218,10 @@
         \item Исследовать влияние спектральной ширины на чёткость колец.
     \end{itemize}
 
+%   ----------------------------------
 
-% -------------------------
+    \section{Моделирование}
 
-\section{Моделирование}
     В данном разделе описывается структура программы, реализующей моделирование колец Ньютона
 
     \subsection{Пользовательский интерфейс и настройка параметров}
@@ -245,7 +251,7 @@
         (например, перемножением на 255) можно получить корректное 8-битное изображение, где 0 соответствует полной
         темноте, а 255 --- максимальной яркости.
 
-        \begin{lstlisting}[language=Python]
+        \begin{lstlisting}[language=MyPython, label={lst:lstlisting}]
         def intensity_mono(self, r, wavelength):
             return 0.5 * (1 - np.cos(2 * np.pi * r ** 2 / (wavelength * self.R)))
         \end{lstlisting}
@@ -278,11 +284,11 @@
         w_i = \frac{S(\lambda_i)}{\sum_{j=1}^{20} S(\lambda_j)}.
         \]
 
-        \begin{lstlisting}[language=Python]
+        \begin{lstlisting}[language=MyPython,label={lst:lstlisting2}]
         def spectral_density(self, wavelength):
             sigma = self.delta_lambda / (2 * np.sqrt(2 * np.log(2)))
             return np.exp(-((wavelength - self.lambda0) ** 2) / (2 * sigma ** 2))
-        
+
         def intensity_quasi(self, r):
             wavelengths = np.linspace(self.lambda0 - self.delta_lambda / 2,
                                       self.lambda0 + self.delta_lambda / 2, 20)
@@ -292,12 +298,11 @@
                     weights[i] = self.spectral_density(wl)
             # normalising
             weights /= np.sum(weights)
-        
+
             for wl, weight in zip(wavelengths, weights):
                 total += weight * self.intensity_mono(r, wl)
             return total
         \end{lstlisting}
-
     \end{itemize}
 
 
@@ -306,7 +311,7 @@
     определяется как функция \( I\left(\sqrt{x^2+y^2}\right) \). Это соответствует преобразованию теоретической
     зависимости \( I(r) \) в изображение, что позволяет получить кольцевую структуру модели.
 
-    \begin{lstlisting}[language=Python]
+    \begin{lstlisting}[language=MyPython,label={lst:lstlisting3}]
         x = np.linspace(-0.01, 0.01, self.size)
         y = np.linspace(-0.01, 0.01, self.size)
         xx, yy = np.meshgrid(x, y)
@@ -321,12 +326,6 @@
         которая приближённо преобразует длину волны в соответствующий RGB-цвет. Это упрощение сделано
         для наглядного отображения спектральных характеристик, так как теория не диктует конкретный
         алгоритм преобразования спектра в цвет.
-
-        % \begin{lstlisting}[language=Python]
-
-        % \end{lstlisting}
     \end{itemize}
-
-%\lstinputlisting[language=Python, caption={Код преобразования интенсивности в изображение}]{path/to/image_conversion_code.py}
-
+    
 \end{document}
