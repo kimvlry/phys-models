@@ -226,10 +226,15 @@
     В этой части кода реализован графический интерфейс пользователя на базе \texttt{Tkinter}.
     Интерфейс позволяет задать следующие параметры:
     \begin{itemize}
-            \item Радиус кривизны \( R \) (м).
-            \item Центральная длина волны \( \lambda_0 \) (нм), которая затем переводится в метры.
-            \item Ширина спектра \(\Delta \lambda\) (нм), также переводимая в метры.
+        \item Радиус кривизны \( R \) (м).
+        \item Центральная длина волны \( \lambda_0 \) (нм), которая затем переводится в метры.
+        \item Ширина спектра \(\Delta \lambda\) (нм), также переводимая в метры.
+        \item Режим освещения - моно-, квази-хроматический, \textit{белый свет}
     \end{itemize}
+    Под \emph{белым светом} в данной работе понимается непрерывный спектр видимого диапазона,
+    состоящий из волн разных длин, объединённых без выраженного пикового распределения.
+    В упрощённой модели этот спектр аппроксимируется равномерным распределением длин волн
+    от 400\,нм до 700\,нм.
 
     \subsection{Расчёт интенсивности}
     Программа рассчитывает интенсивность интерференционной картины в зависимости от радиальной координаты \( r \).
@@ -264,44 +269,68 @@
 
         В реализации используется следующий подход:
         \begin{itemize}
-            \item Выбирается 20 равномерно распределённых точек в указанном диапазоне длин волн.
-            \item Для каждой длины волны вычисляется вклад (вес) \( S(\lambda) \) с помощью функции
-            \texttt{spectral\_density}.
-            \item Весовые коэффициенты нормируются так, чтобы их сумма была равна 1. Это необходимо,
-            чтобы итоговое усреднение не зависело от числа дискретных точек.
-            \item Итоговая интенсивность вычисляется как сумма произведений интенсивности для каждой длины
-            волны (рассчитанной по функции \texttt{intensity\_mono}) и соответствующего весового коэффициента.
+            \item Генерируется массив из 20 равномерных длин волн \(\{\lambda_i\}\) в указанном диапазоне.
+            \item Вычисляются веса
+            \[
+                w_i = \frac{S(\lambda_i)}{\sum_{j=1}^{20} S(\lambda_j)},
+            \]
+            с помощью одной векторной операции:
+            \texttt{weights = np.array([self.spectral\_density(wl) for wl in wavelengths]); weights /= weights.sum()}.
+            \item Создаётся трёхканальный массив \(\mathrm{image}[x,y,k]\), \(k\in\{0,1,2\}\) для RGB:
+            \begin{itemize}
+                \item для каждой \(\lambda_i\) рассчитывается скалярное поле интенсивности
+                \(I_{\rm mono}(r,\lambda_i)\) функцией \texttt{intensity\_mono},
+                \item находят цветовые коэффициенты \(\mathrm{rgb} = \texttt{wavelength\_to\_rgb}(\lambda_i)\),
+                \item и суммируют вклад во все три канала:
+                \[
+                    \mathrm{image}[:,:,k] \;\mathrel{+}=\, w_i\,I_{\rm mono}(r,\lambda_i)\,\mathrm{rgb}[k].
+                \]
+            \end{itemize}
+            \item После цикла массив нормализуется по максимуму,
+            умножается на 255 и приводится к типу \texttt{uint8}:
+            \[
+                \mathrm{image} \;\to\; \frac{\mathrm{image}}{\max(\mathrm{image})}\times255.
+            \]
         \end{itemize}
 
-        Таким образом, формула расчёта интенсивности в коде принимает вид:
+        \begin{lstlisting}[language=MyPython,label={lst:lstlisting2}]
+            def intensity_quasi(self, r):
+                wavelengths = np.linspace(self.lambda0 - self.delta_lambda / 2,
+                                          self.lambda0 + self.delta_lambda / 2, 20)
+                weights = np.array([self.spectral_density(wl) for wl in wavelengths])
+                weights /= np.sum(weights)
+
+                image = np.zeros((r.shape[0], r.shape[1], 3))
+                for wl, weight in zip(wavelengths, weights):
+                    I = self.intensity_mono(r, wl)
+                    rgb = wavelength_to_rgb(wl)
+                    for i in range(3):
+                        image[:, :, i] += weight * I * rgb[i]
+                image /= np.max(image)
+                return (image * 255).astype(np.uint8)
+        \end{lstlisting}
+
+    Итого, \texttt{intensity\_quasi} возвращает готовое RGB-изображение. Пусть через
+        \(\mathrm{rgb}_k(\lambda_i)\), \(k\in\{R,G,B\}\), обозначается \(k\)-я компонентa,
+        возвращаемая функцией \texttt{wavelength\_to\_rgb}(\(\lambda_i\)).
+        Тогда для каждого канала выполняется взвешенная сумма:
         \[
-        I_{\text{quasi}}(r) = \sum_{i=1}^{20} w_i \, I_{\text{mono}}(r, \lambda_i),
+        \begin{aligned}
+        R(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_R(\lambda_i),\\
+        G(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_G(\lambda_i),\\
+        B(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_B(\lambda_i),
+        \end{aligned}
         \]
         где
         \[
-        w_i = \frac{S(\lambda_i)}{\sum_{j=1}^{20} S(\lambda_j)}.
+        w_i = \frac{S(\lambda_i)}{\sum_{j=1}^{20}S(\lambda_j)},
+        \qquad
+        I_{\rm mono}(r,\lambda_i) = 0.5\bigl[1 - \cos\!(2\pi r^2/(\lambda_i R))\bigr].
         \]
+        После вычисления всех трёх каналов массив \(\bigl[R(r),G(r),B(r)\bigr]\) нормализуется
+        по своему максимуму и масштабируется в диапазон \([0,255]\), получая итоговое 8-битное RGB-изображение.
 
-        \begin{lstlisting}[language=MyPython,label={lst:lstlisting2}]
-        def spectral_density(self, wavelength):
-            sigma = self.delta_lambda / (2 * np.sqrt(2 * np.log(2)))
-            return np.exp(-((wavelength - self.lambda0) ** 2) / (2 * sigma ** 2))
-
-        def intensity_quasi(self, r):
-            wavelengths = np.linspace(self.lambda0 - self.delta_lambda / 2,
-                                      self.lambda0 + self.delta_lambda / 2, 20)
-            total = np.zeros_like(r)
-            weights = np.zeros_like(wavelengths)
-            for i, wl in enumerate(wavelengths):
-                    weights[i] = self.spectral_density(wl)
-            # normalising
-            weights /= np.sum(weights)
-
-            for wl, weight in zip(wavelengths, weights):
-                total += weight * self.intensity_mono(r, wl)
-            return total
-        \end{lstlisting}
-    \end{itemize}
+        \end{itemize}
 
 
     \subsection{Построение двумерного поля интенсивности}
@@ -315,16 +344,6 @@
         xx, yy = np.meshgrid(x, y)
         r = np.sqrt(xx ** 2 + yy ** 2)
     \end{lstlisting}
-
-    \subsection{Преобразование интенсивности в изображение и цветовое отображение}
-    После расчёта интенсивности выполняется нормировка и преобразование полученных значений в изображение:
-    \begin{itemize}
-        \item Значения интенсивности умножаются на 255 для перевода в 8-битное представление.
-        \item В случае монохроматического света реализуется функция \texttt{wavelength\_to\_rgb},
-        которая приближённо преобразует длину волны в соответствующий RGB-цвет. Это упрощение сделано
-        для наглядного отображения спектральных характеристик, так как теория не диктует конкретный
-        алгоритм преобразования спектра в цвет.
-    \end{itemize}
 
 
     \section{Демо-примеры запуска программы}
@@ -345,4 +364,7 @@
 
     \subsection{Квазихром с широким спектром волн}
     \includegraphics[scale=0.7]{3. Newton's rings/demo results/wideSpectre_quasi}
+
+    \subsection{Белый свет}
+    \includegraphics[scale=0.7]{3. Newton's rings/demo results/whiteLight}
 \end{document}
