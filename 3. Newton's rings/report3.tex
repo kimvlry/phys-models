@@ -47,9 +47,9 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 \lstdefinelanguage{MyPython}{
-  language=Python,
-  morekeywords={np, plt, self, cos, sin},
-  sensitive=true,
+    language=Python,
+    morekeywords={np, plt, self, cos, sin},
+    sensitive=true,
 }
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},
@@ -218,6 +218,8 @@
 %   ----------------------------------
 
     \newpage
+
+
     \section{Моделирование}
 
     В данном разделе описывается структура программы, реализующей моделирование колец Ньютона
@@ -244,7 +246,7 @@
         по формуле (9), где \(I_0\) представлена коэффициентом нормировки (в коде установлено значение 0.5).
         Значение выражения \(1 - \cos(\cdot)\) изменяется от 0 до 2, поскольку
         \(\
-            \cos\left(\frac{2\pi r^2}{\lambda R}\right) \in [-1, 1].
+        \cos\left(\frac{2\pi r^2}{\lambda R}\right) \in [-1, 1].
         \)
         Если принять \(I_0 = 0.5\), то получим
         \[
@@ -262,7 +264,7 @@
         \item{\textbf{Квазимонохроматический случай. Усреднение с использованием спектральной плотности}}
         При квазимонохроматическом освещении свет рассматривается как диапазон длин волн
         \[
-        \lambda_i \in \left[\lambda_0 - \frac{\Delta\lambda}{2}, \, \lambda_0 + \frac{\Delta\lambda}{2}\right],
+            \lambda_i \in \left[\lambda_0 - \frac{\Delta\lambda}{2}, \, \lambda_0 + \frac{\Delta\lambda}{2}\right],
         \]
         распределённых вокруг центрального значения \(\lambda_0\). Теоретически интенсивность
         определяется по формуле (13), где \(S(\lambda)\) задаётся Гауссовой функцией (14)
@@ -310,28 +312,27 @@
                 return (image * 255).astype(np.uint8)
         \end{lstlisting}
 
-    Итого, \texttt{intensity\_quasi} возвращает готовое RGB-изображение. Пусть через
+        Итого, \texttt{intensity\_quasi} возвращает готовое RGB-изображение. Пусть через
         \(\mathrm{rgb}_k(\lambda_i)\), \(k\in\{R,G,B\}\), обозначается \(k\)-я компонентa,
         возвращаемая функцией \texttt{wavelength\_to\_rgb}(\(\lambda_i\)).
         Тогда для каждого канала выполняется взвешенная сумма:
         \[
-        \begin{aligned}
-        R(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_R(\lambda_i),\\
-        G(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_G(\lambda_i),\\
-        B(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_B(\lambda_i),
-        \end{aligned}
+            \begin{aligned}
+                R(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_R(\lambda_i),\\
+                G(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_G(\lambda_i),\\
+                B(r) &= \sum_{i=1}^{20} w_i \; I_{\rm mono}(r,\lambda_i)\;\mathrm{rgb}_B(\lambda_i),
+            \end{aligned}
         \]
         где
         \[
-        w_i = \frac{S(\lambda_i)}{\sum_{j=1}^{20}S(\lambda_j)},
-        \qquad
-        I_{\rm mono}(r,\lambda_i) = 0.5\bigl[1 - \cos\!(2\pi r^2/(\lambda_i R))\bigr].
+            w_i = \frac{S(\lambda_i)}{\sum_{j=1}^{20}S(\lambda_j)},
+            \qquad
+            I_{\rm mono}(r,\lambda_i) = 0.5\bigl[1 - \cos\!(2\pi r^2/(\lambda_i R))\bigr].
         \]
         После вычисления всех трёх каналов массив \(\bigl[R(r),G(r),B(r)\bigr]\) нормализуется
         по своему максимуму и масштабируется в диапазон \([0,255]\), получая итоговое 8-битное RGB-изображение.
 
-        \end{itemize}
-
+    \end{itemize}
 
     \subsection{Построение двумерного поля интенсивности}
     Для визуализации интерференционной картины создаётся двумерная координатная сетка, где интенсивность \( I(x,y) \)
@@ -347,6 +348,7 @@
 
 
     \section{Демо-примеры запуска программы}
+
     \subsection{Монохром, близкий к ИК}
     \includegraphics[scale=0.7]{3. Newton's rings/demo results/infraRed_mono}
 
@@ -367,4 +369,49 @@
 
     \subsection{Белый свет}
     \includegraphics[scale=0.7]{3. Newton's rings/demo results/whiteLight}
+
+
+    \section{Вывооооод}
+    Можно заметить, что интерференция на определенных промежутках становится невидимой, а потом (с большим радиусом) возвращается.
+    Почему?(?)
+    Для тёмных колец (минимумов интерференции) радиус $r_m$ определяется выражением:
+    \[
+        r_m = \sqrt{(2m + 1) \frac{\lambda R}{2}}
+    \]
+    где:
+    \begin{itemize}
+        \item $m$ — порядок минимума ($m = 0, 1, 2, \ldots$),
+        \item $\lambda$ — длина волны света,
+        \item $R$ — радиус кривизны линзы.
+    \end{itemize}
+
+    Для светлых колец (максимумов интерференции):
+    \[
+        r_m = \sqrt{m \lambda R}
+    \]
+
+    \textbf{Причины исчезновения интерференции}
+    Белый свет содержит множество длин волн $\lambda$ (от 400 до 700~нм).
+    Каждая длина волны создаёт собственную систему колец с различными радиусами. В результате:
+
+    Кольца от разных длин волн \textbf{не совпадают} пространственно:
+    \[
+        r_m^{(\lambda_1)} = \sqrt{m \lambda_1 R}, \quad
+        r_m^{(\lambda_2)} = \sqrt{m \lambda_2 R}
+    \]
+
+    При наложении разных систем колец происходит \textbf{взаимное гашение}: свет одного цвета может находиться в максимуме,
+    другой — в минимуме.
+
+    \textbf{Причины восстановления интерференции}
+    При больших номерах $m$ может наблюдаться частичное совпадение колец разных длин волн.
+    Это возможно, если для двух длин волн $\lambda_1$ и $\lambda_2$ выполняется:
+
+    \[
+        \sqrt{m_1 \lambda_1 R} \approx \sqrt{m_2 \lambda_2 R} \quad \Rightarrow \quad m_1 \lambda_1 \approx m_2 \lambda_2
+    \]
+
+    Таким образом, кольца от разных длин волн снова накладываются конструктивно (потому что волны усиливают друг друга),
+    и картина интерференции \textbf{восстанавливается}.
+
 \end{document}
