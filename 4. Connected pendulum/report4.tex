@@ -333,9 +333,6 @@
 \end{lstlisting}
 
 \subsection*{5. Построение графиков}
-
-Аналитическая постановка: визуализация $\phi_i(t)$ и $\dot{\phi}_i(t)$ для $i=1,2$.
-
 \begin{lstlisting}[language=MyPython,label={lst:lstlisting5}]
     # angles graphic
     ax1.plot(t, phi1, label='\phi_2(t)')
@@ -352,20 +349,41 @@
     ax2.legend()
 \end{lstlisting}
 
-%\subsection*{6. Вычисление нормальных частот}
-%
-%Аналитические формулы:
-%\begin{align*}
-%  \Omega_1 &= \sqrt{\frac{g}{L}}, \\
-%  \Omega_2 &= \sqrt{\frac{g}{L} + 2\kappa^2}.
-%\end{align*}
-%
-%\begin{lstlisting}[language=MyPython,label={lst:lstlisting6}]
-%    Omega_n1 = np.sqrt(omega0_sq)           # Ω₁ = √(g/L)
-%    Omega_n2 = np.sqrt(omega0_sq + 2*K)     # Ω₂ = √(g/L + 2κ²)
-%    print(f"Нормальные частоты: Ω₁={Omega_n1:.3f}, Ω₂={Omega_n2:.3f}")
-%\end{lstlisting}
+\subsection*{6. Вычисление нормальных частот}
+
+Аналитические формулы:
+\begin{align*}
+  \Omega_1 &= \sqrt{\frac{g}{L}}, \\
+  \Omega_2 &= \sqrt{\frac{g}{L} + 2\kappa^2}.
+\end{align*}
+
+\begin{lstlisting}[language=MyPython,label={lst:lstlisting6}]
+    omega1 = np.sqrt(9.81 / L)
+    omega2 = np.sqrt(9.81 / L + 2 * k * L1 ** 2 / (m * L ** 2))
+\end{lstlisting}
+
+\section{Демо-примеры запуска программы}
+    \subsection{Дефолтные параметры}
+        \includegraphics[scale=0.5]{4. Connected pendulum/demo results/default_params}
+
+    \subsection{Биение в суперпозиции}
+        \includegraphics[scale=0.5]{4. Connected pendulum/demo results/super_position_hitting}
+
+    \subsection{Симфазное колебание с высокой жесткостью пружины}
+        \includegraphics[scale=0.5]{4. Connected pendulum/demo results/synced_high_param_K}
+
+    \subsection{Противофазное колебание с высокой массой подвеса}
+        \includegraphics[scale=0.5]{4. Connected pendulum/demo results/unsynced_heavy_pendulums}
 
 
 \section*{Выводы}
+    На всех представленных графиках — независимо от начальных условий и параметров системы — чётко прослеживается
+    зеркальная симметрия углов и угловых скоростей маятников.
+    Это поведение отражает фундаментальное свойство колебательной системы из двух связанных маятников при симметричных
+    параметрах: движение одного маятника зеркально компенсируется движением другого.
+    Такая антисимметрия указывает на возбуждение либо противофазной моды, либо линейной комбинации нормальных мод,
+    где один маятник отдаёт энергию другому.
+    Кроме того, в каждом случае наблюдается, что графики углов и скоростей следуют в противоположных фазах: пики углов
+    соответствуют нулям скоростей и наоборот, что типично для гармонических колебаний.
+
 \end{document}
