@@ -8,37 +8,40 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 def calculate_and_plot():
     try:
-        # Считывание параметров
-        m = float(entry_m.get())
-        L = float(entry_L.get())
-        L1 = float(entry_L1.get())
-        k = float(entry_k.get())
-        beta = float(entry_beta.get())
-        theta1_0 = float(entry_theta1.get())
-        theta2_0 = float(entry_theta2.get())
-        v1_0 = float(entry_v1.get())
-        v2_0 = float(entry_v2.get())
-        t_max = float(entry_time.get())
+        # # Считывание параметров
+        m = float(entry_m.get())          # mass of pendulums (kg)
+        L = float(entry_L.get())          # length of pendulum string (m)
+        L1 = float(entry_L1.get())        # distance from suspension point to spring attachment (m)
+        k = float(entry_k.get())          # spring stiffness (N/m)
+        beta = float(entry_beta.get())    # damping coefficient (kg/s)
+
+        phi1_0 = float(entry_phi1.get())  # initial angle of first pendulum (rad)
+        phi2_0 = float(entry_phi2.get())  # initial angle of second pendulum (rad)
+
+        v1_0 = float(entry_v1.get())      # initial angular velocity of first pendulum (rad/s)
+        v2_0 = float(entry_v2.get())      # initial angular velocity of second pendulum (rad/s)
+
+        t_max = float(entry_time.get())   # maximum simulation time (s)
 
         t = np.linspace(0, t_max, 1000)
 
         # Система ОДУ
         def system(y, t, m, L, L1, k, beta, g=9.81):
-            theta1, v1, theta2, v2 = y
+            phi1, v1, phi2, v2 = y
             K = k * L1 ** 2 / (m * L ** 2)
             omega0_sq = g / L
             dydt = [
                 v1,
-                -(beta / m) * v1 - (omega0_sq + K) * theta1 + K * theta2,
+                -(beta / m) * v1 - (omega0_sq + K) * phi1 + K * phi2,
                 v2,
-                -(beta / m) * v2 - (omega0_sq + K) * theta2 + K * theta1
+                -(beta / m) * v2 - (omega0_sq + K) * phi2 + K * phi1
             ]
             return dydt
 
         # Решение
-        y0 = [theta1_0, v1_0, theta2_0, v2_0]
+        y0 = [phi1_0, v1_0, phi2_0, v2_0]
         sol = odeint(system, y0, t, args=(m, L, L1, k, beta))
-        theta1, v1, theta2, v2 = sol[:, 0], sol[:, 1], sol[:, 2], sol[:, 3]
+        phi1, v1, phi2, v2 = sol[:, 0], sol[:, 1], sol[:, 2], sol[:, 3]
 
         # Очистка предыдущих графиков
         for widget in graph_frame.winfo_children():
@@ -46,8 +49,8 @@ def calculate_and_plot():
 
         # Создание новых графиков
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6))
-        ax1.plot(t, theta1, label='θ₁(t)')
-        ax1.plot(t, theta2, label='θ₂(t)')
+        ax1.plot(t, phi1, label='θ₁(t)')
+        ax1.plot(t, phi2, label='θ₂(t)')
         ax1.set_xlabel('Время (с)')
         ax1.set_ylabel('Угол (рад)')
         ax1.legend()
@@ -103,14 +106,14 @@ entry_beta.grid(row=4, column=1)
 entry_beta.insert(0, "0.1")
 
 ttk.Label(input_frame, text="Начальный θ1 (rad):").grid(row=5, column=0, sticky="w")
-entry_theta1 = ttk.Entry(input_frame)
-entry_theta1.grid(row=5, column=1)
-entry_theta1.insert(0, "0.1")
+entry_phi1 = ttk.Entry(input_frame)
+entry_phi1.grid(row=5, column=1)
+entry_phi1.insert(0, "0.1")
 
 ttk.Label(input_frame, text="Начальный θ2 (rad):").grid(row=6, column=0, sticky="w")
-entry_theta2 = ttk.Entry(input_frame)
-entry_theta2.grid(row=6, column=1)
-entry_theta2.insert(0, "0.0")
+entry_phi2 = ttk.Entry(input_frame)
+entry_phi2.grid(row=6, column=1)
+entry_phi2.insert(0, "0.0")
 
 ttk.Label(input_frame, text="Начальная v1 (rad/s):").grid(row=7, column=0, sticky="w")
 entry_v1 = ttk.Entry(input_frame)

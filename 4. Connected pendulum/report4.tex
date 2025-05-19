@@ -14,9 +14,16 @@
 \usepackage{makecell}
 \usepackage{float}
 \usepackage{graphicx}
+\graphicspath{{../}}
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{listings}
 
-\definecolor{shadecolor}{RGB}{245,245,247} 
+\definecolor{shadecolor}{RGB}{245,245,247}
 \geometry{left=2cm, right=2cm, top=2cm, bottom=2cm}
+
 
 \title{Модель №.4. \\ Магнитные колебания. \\ Связанные маятники }
 \author{Ким В.Р., Вишневский С.А \\ Группа M3207 }
@@ -32,6 +39,38 @@
 \newenvironment{answer}
 {\par\noindent\textbf{Ответ:} }
 {\par}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinelanguage{MyPython}{
+    language=Python,
+    morekeywords={np, plt, self, cos, sin},
+    sensitive=true,
+}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    columns=fullflexible,
+}
+
+\lstset{style=mystyle}
 
 \begin{document}
 \maketitle
@@ -50,18 +89,13 @@
 
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.5\textwidth]{"4. Connected pendulum/task.png"}  
+        \includegraphics[width=0.5\textwidth]{task}\label{fig:figure}
     \end{figure}
 
 \end{task}
 
 
-
-Ниже представлено подробное описание теоретических основ, необходимых для моделирования системы 
-двух связанных математических маятников. Все определения, формулы и рассуждения приведены с обоснованием 
-их использования в численной модели.
-
-\subsection*{1. Введение и постановка задачи}
+\section*{Введение и постановка задачи}
 Рассматривается система двух идентичных математических маятников, подвешенных на равной высоте, соединённых 
 пружиной с коэффициентом жёсткости \( k \). Пружина прикреплена к маятникам на расстоянии \( L_1 \) от точки 
 их крепления. Каждый маятник имеет длину \( L \) и массу \( m \). Для каждого маятника учитывается сила 
@@ -70,7 +104,7 @@
 
 
 
-\subsection*{2. Математический маятник: определения и базовые уравнения}
+\section*{Математический маятник: определения и базовые уравнения}
 \textbf{Математический маятник} --- идеализированная модель, в которой масса сосредоточена в точке, а подвес 
 считается нерастяжимым и безмассовым. Обобщённой координатой является угол отклонения \(\phi\) от вертикального 
 направления (положения равновесия).
@@ -97,7 +131,7 @@
 
 
 
-\subsection*{3. Система двух связанных маятников}
+\subsection*{Система двух связанных маятников}
 При рассмотрении двух маятников, связанных пружиной, следует учитывать взаимодействие, возникающее 
 из-за разности их углов. Обозначим:
 \[
@@ -106,12 +140,10 @@
 --- углы отклонения первого и второго маятников соответственно.
 
 В отсутствие затухания, уравнения движения можно записать следующим образом:
-\[
-\ddot{\phi}_1 + \omega_0^2 \phi_1 - \kappa^2 (\phi_2 - \phi_1) = 0,
-\]
-\[
-\ddot{\phi}_2 + \omega_0^2 \phi_2 + \kappa^2 (\phi_2 - \phi_1) = 0.
-\]
+\begin{gather}
+    \ddot{\phi}_1 + \omega_0^2 \phi_1 - \kappa^2 (\phi_2 - \phi_1) = 0,\\
+    \ddot{\phi}_2 + \omega_0^2 \phi_2 + \kappa^2 (\phi_2 - \phi_1) = 0.\\
+\end{gather}
 Здесь введён параметр связи \(\kappa\), который определяется через жёсткость пружины и геометрию 
 системы. Часто встречается соотношение:
 \[
@@ -121,40 +153,34 @@
 уменьшить разницу углов маятников.
 
 С учётом затухания уравнения дополняются членами, пропорциональными скорости:
-\[
-\ddot{\phi}_1 + 2\beta\dot{\phi}_1 + \omega_0^2 \phi_1 - \kappa^2 (\phi_2 - \phi_1) = 0,
-\]
-\[
-\ddot{\phi}_2 + 2\beta\dot{\phi}_2 + \omega_0^2 \phi_2 + \kappa^2 (\phi_2 - \phi_1) = 0.
-\]
+\begin{gather}
+    \ddot{\phi}_1 + 2\beta\dot{\phi}_1 + \omega_0^2 \phi_1 - \kappa^2 (\phi_2 - \phi_1) = 0,\\
+    \ddot{\phi}_2 + 2\beta\dot{\phi}_2 + \omega_0^2 \phi_2 + \kappa^2 (\phi_2 - \phi_1) = 0.\\
+\end{gather}
 
 
 
-\subsection*{4. Преобразование в нормальные координаты и нормальные моды}
+\subsection*{Преобразование в нормальные координаты и нормальные моды}
 Для упрощения анализа системы удобно ввести нормальные координаты:
 \[
 \xi_1 = \phi_1 + \phi_2, \quad \xi_2 = \phi_2 - \phi_1.
 \]
 Путём суммирования и вычитания исходных уравнений движения (без затухания для чистоты рассуждения) 
 получаем:
-\[
-\ddot{\xi}_1 + \omega_0^2 \xi_1 = 0,
-\]
-\[
-\ddot{\xi}_2 + \left(\omega_0^2 + 2\kappa^2\right) \xi_2 = 0.
-\]
+\begin{gather*}
+    \ddot{\xi}_1 + \omega_0^2 \xi_1 = 0,\\
+    \ddot{\xi}_2 + \left(\omega_0^2 + 2\kappa^2\right) \xi_2 = 0.\\
+\end{gather*}
 Таким образом, система сводится к двум независимым колебательным уравнениям с нормальными частотами:
 \[
 \Omega_{n1} = \omega_0 = \sqrt{\frac{g}{L}}, \quad \Omega_{n2} = \sqrt{\omega_0^2 + 2\kappa^2} = \sqrt{\frac{g}{L} + \frac{2kL_1^2}{mL^2}}.
 \]
 
 Решения для нормальных координат имеют вид:
-\[
-\xi_1(t) = \Phi_{01}\cos\left(\Omega_{n1}t+\varphi_{01}\right),
-\]
-\[
-\xi_2(t) = \Phi_{02}\cos\left(\Omega_{n2}t+\varphi_{02}\right),
-\]
+\begin{gather*}
+    \xi_1(t) = \Phi_{01}\cos\left(\Omega_{n1}t+\varphi_{01}\right),\\
+    \xi_2(t) = \Phi_{02}\cos\left(\Omega_{n2}t+\varphi_{02}\right),\\
+\end{gather*}
 где \(\Phi_{01}, \Phi_{02}\) --- амплитуды, а \(\varphi_{01}, \varphi_{02}\) --- начальные фазы, 
 определяемые начальными условиями.
 
@@ -163,16 +189,14 @@
 \phi_1 = \frac{\xi_1+\xi_2}{2}, \quad \phi_2 = \frac{\xi_1-\xi_2}{2}.
 \]
 В результате получаем общее решение для углов:
-\[
-\phi_1(t) = \frac{1}{2}\left[\Phi_{01}\cos\left(\Omega_{n1}t+\varphi_{01}\right)+\Phi_{02}\cos\left(\Omega_{n2}t+\varphi_{02}\right)\right],
-\]
-\[
-\phi_2(t) = \frac{1}{2}\left[\Phi_{01}\cos\left(\Omega_{n1}t+\varphi_{01}\right)-\Phi_{02}\cos\left(\Omega_{n2}t+\varphi_{02}\right)\right].
-\]
+\begin{gather*}
+    \phi_1(t) = \frac{1}{2}\left[\Phi_{01}\cos\left(\Omega_{n1}t+\varphi_{01}\right)+\Phi_{02}\cos\left(\Omega_{n2}t+\varphi_{02}\right)\right],\\
+    \phi_2(t) = \frac{1}{2}\left[\Phi_{01}\cos\left(\Omega_{n1}t+\varphi_{01}\right)-\Phi_{02}\cos\left(\Omega_{n2}t+\varphi_{02}\right)\right].\\
+\end{gather*}
 
 
 
-\subsection*{5. Режимы колебаний}
+\subsection*{Режимы колебаний}
 В зависимости от начальных условий в системе могут возникать различные режимы колебаний:
 
 \begin{enumerate}
@@ -209,21 +233,19 @@
 
 
 
-\subsection*{6. Учет затухания в системе}
+\subsection*{Учет затухания в системе}
 В реальных системах затухание приводит к экспоненциальному уменьшению амплитуд. Сила затухания для каждого 
 маятника пропорциональна его скорости, поэтому к уравнениям движения добавляется член \(2\beta\dot{\phi}\). 
 Итоговые уравнения с учетом затухания имеют вид:
-\[
-\ddot{\phi}_1 + 2\beta\dot{\phi}_1 + \omega_0^2 \phi_1 - \kappa^2 (\phi_2 - \phi_1) = 0,
-\]
-\[
-\ddot{\phi}_2 + 2\beta\dot{\phi}_2 + \omega_0^2 \phi_2 + \kappa^2 (\phi_2 - \phi_1) = 0.
-\]
+\begin{gather}
+    \ddot{\phi}_1 + 2\beta\dot{\phi}_1 + \omega_0^2 \phi_1 - \kappa^2 (\phi_2 - \phi_1) = 0,\\
+    \ddot{\phi}_2 + 2\beta\dot{\phi}_2 + \omega_0^2 \phi_2 + \kappa^2 (\phi_2 - \phi_1) = 0.\\
+\end{gather}
 Эти уравнения описывают, как затухание влияет на динамику системы, уменьшая амплитуду колебаний с течением времени.
 
 
 
-\subsection*{7. Итоговая схема моделирования и интерпретация результатов}
+\subsection*{Итоговая схема моделирования и интерпретация результатов}
 При численной реализации модели выполняются следующие этапы:
 \begin{itemize}
     \item \textbf{Инициализация параметров:} вводятся значения \(m\), \(L\), \(L_1\), \(k\), \(\beta\), \(g\) 
@@ -242,13 +264,107 @@
     и противофазных колебаний.
 \end{itemize}
 
-\subsection*{8. Заключение}
-Представленная теоретическая база охватывает основные аспекты динамики двух связанных математических 
-маятников с учётом затухания и пружинной связи. Были приведены определения математического маятника, 
-обоснованы базовые уравнения движения, выполнено преобразование в нормальные координаты и получены 
-выражения для нормальных частот. Описаны режимы синфазных и противофазных колебаний, а также эффект 
-биений при возбуждении обеих нормальных мод. Эти положения лягут в основу численного моделирования 
-системы, что позволяет визуализировать динамику угловых отклонений и скоростей, а также 
-исследовать влияние параметров системы на её поведение.
 
+\section*{Моделирование}
+
+\subsection*{1. Инициализация параметров}
+\begin{equation}
+  m,\ L,\ L_1,\ k,\ \beta\label{eq:equation2}
+\end{equation}
+
+\begin{lstlisting}[language=MyPython,label={lst:lstlisting3}]
+    m = float(entry_m.get())          # mass of pendulums (kg)
+    L = float(entry_L.get())          # length of pendulum string (m)
+    L1 = float(entry_L1.get())        # distance from suspension point to spring attachment (m)
+    k = float(entry_k.get())          # spring stiffness (N/m)
+    beta = float(entry_beta.get())    # damping coefficient (kg/s)
+\end{lstlisting}
+
+\subsection*{2. Задание начальных условий}
+\begin{equation}
+  \phi_1(0),\ \phi_2(0),\ \dot{\phi}_1(0),\ \dot{\phi}_2(0),\ T\label{eq:equation}
+\end{equation}
+
+\begin{lstlisting}[language=MyPython,label={lst:lstlisting2}]
+    phi1_0 = float(entry_phi1.get())  # initial angle of first pendulum (rad)
+    phi2_0 = float(entry_phi2.get())  # initial angle of second pendulum (rad)
+
+    v1_0 = float(entry_v1.get())      # initial angular velocity of first pendulum (rad/s)
+    v2_0 = float(entry_v2.get())      # initial angular velocity of second pendulum (rad/s)
+
+    t_max = float(entry_time.get())   # maximum simulation time (s)
+\end{lstlisting}
+
+\subsection*{3. Система уравнений движения}
+
+Аналитическая запись:
+\begin{align*}
+  \ddot{\phi}_1 &+ \frac{\beta}{m} \dot{\phi}_1 + \bigl(\tfrac{g}{L} + \kappa^2\bigr)\phi_1 - \kappa^2 \phi_2 = 0, \\
+  \ddot{\phi}_2 &+ \frac{\beta}{m} \dot{\phi}_2 + \bigl(\tfrac{g}{L} + \kappa^2\bigr)\phi_2 - \kappa^2 \phi_1 = 0, \\
+  \kappa^2 &= \frac{k L_1^2}{m L^2}.
+\end{align*}
+
+\begin{lstlisting}[language=MyPython,label={lst:lstlisting}]
+def system(y, t, m, L, L1, k, beta, g=9.81):
+    phi1, v1, phi2, v2 = y
+    K = k * L1**2 / (m * L**2)      # κ² = k L1² / (m L²)
+    omega0_sq = g / L               # ω₀² = g / L
+    dydt = [
+        v1,
+        -(beta/m)*v1 - (omega0_sq + K)*phi1 + K*phi2,
+        v2,
+        -(beta/m)*v2 - (omega0_sq + K)*phi2 + K*phi1
+    ]
+    return dydt
+\end{lstlisting}
+
+\subsection*{4. Численное интегрирование}
+
+Аналитическая форма: решение системы ОДУ
+\begin{equation}
+  \frac{d\mathbf{y}}{dt} = \mathrm{system}(\mathbf{y}, t)\label{eq:equation3}
+\end{equation}
+
+\begin{lstlisting}[language=MyPython,label={lst:lstlisting4}]
+    y0  = [phi1_0, v1_0, phi2_0, v2_0]
+    sol = odeint(system, y0, t, args=(m, L, L1, k, beta))
+    phi1, v1, phi2, v2 = sol[:,0], sol[:,1], sol[:,2], sol[:,3]
+\end{lstlisting}
+
+\subsection*{5. Построение графиков}
+
+Аналитическая постановка: визуализация $\phi_i(t)$ и $\dot{\phi}_i(t)$ для $i=1,2$.
+
+\begin{lstlisting}[language=MyPython,label={lst:lstlisting5}]
+    # График углов
+    ax1.plot(t, phi1, label='φ₁(t)')
+    ax1.plot(t, phi2, label='φ₂(t)')
+    ax1.set_xlabel('t, с')
+    ax1.set_ylabel('φ, рад')
+    ax1.legend()
+
+    # График скоростей
+    ax2.plot(t, v1, label='φ̇₁(t)')
+    ax2.plot(t, v2, label='φ̇₂(t)')
+    ax2.set_xlabel('t, с')
+    ax2.set_ylabel('скорость, рад/с')
+    ax2.legend()
+\end{lstlisting}
+
+%\subsection*{6. Вычисление нормальных частот}
+%
+%Аналитические формулы:
+%\begin{align*}
+%  \Omega_1 &= \sqrt{\frac{g}{L}}, \\
+%  \Omega_2 &= \sqrt{\frac{g}{L} + 2\kappa^2}.
+%\end{align*}
+%
+%\begin{lstlisting}[language=MyPython,label={lst:lstlisting6}]
+%    Omega_n1 = np.sqrt(omega0_sq)           # Ω₁ = √(g/L)
+%    Omega_n2 = np.sqrt(omega0_sq + 2*K)     # Ω₂ = √(g/L + 2κ²)
+%    print(f"Нормальные частоты: Ω₁={Omega_n1:.3f}, Ω₂={Omega_n2:.3f}")
+%\end{lstlisting}
+
+
+\section*{Выводы}
 \end{document}
