@@ -7,21 +7,22 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 def calculate_and_plot():
+    normal_freq_label.config(text="")  # очистка старого текста
     try:
         # # Считывание параметров
-        m = float(entry_m.get())          # mass of pendulums (kg)
-        L = float(entry_L.get())          # length of pendulum string (m)
-        L1 = float(entry_L1.get())        # distance from suspension point to spring attachment (m)
-        k = float(entry_k.get())          # spring stiffness (N/m)
-        beta = float(entry_beta.get())    # damping coefficient (kg/s)
+        m = float(entry_m.get())  # mass of pendulums (kg)
+        L = float(entry_L.get())  # length of pendulum string (m)
+        L1 = float(entry_L1.get())  # distance from suspension point to spring attachment (m)
+        k = float(entry_k.get())  # spring stiffness (N/m)
+        beta = float(entry_beta.get())  # damping coefficient (kg/s)
 
         phi1_0 = float(entry_phi1.get())  # initial angle of first pendulum (rad)
         phi2_0 = float(entry_phi2.get())  # initial angle of second pendulum (rad)
 
-        v1_0 = float(entry_v1.get())      # initial angular velocity of first pendulum (rad/s)
-        v2_0 = float(entry_v2.get())      # initial angular velocity of second pendulum (rad/s)
+        v1_0 = float(entry_v1.get())  # initial angular velocity of first pendulum (rad/s)
+        v2_0 = float(entry_v2.get())  # initial angular velocity of second pendulum (rad/s)
 
-        t_max = float(entry_time.get())   # maximum simulation time (s)
+        t_max = float(entry_time.get())  # maximum simulation time (s)
 
         t = np.linspace(0, t_max, 1000)
 
@@ -42,7 +43,13 @@ def calculate_and_plot():
         y0 = [phi1_0, v1_0, phi2_0, v2_0]
         sol = odeint(system, y0, t, args=(m, L, L1, k, beta))
         phi1, v1, phi2, v2 = sol[:, 0], sol[:, 1], sol[:, 2], sol[:, 3]
+        # Расчёт нормальных частот (без затухания)
+        omega1 = np.sqrt(9.81 / L)
+        omega2 = np.sqrt(9.81 / L + 2 * k * L1 ** 2 / (m * L ** 2))
 
+        normal_freq_label.config(
+            text=f"Нормальные частоты:\nω₁ = {omega1:.3f} рад/с\nω₂ = {omega2:.3f} рад/с"
+        )
         # Очистка предыдущих графиков
         for widget in graph_frame.winfo_children():
             widget.destroy()
@@ -132,6 +139,9 @@ entry_time.insert(0, "10")
 
 calculate_btn = ttk.Button(input_frame, text="Рассчитать", command=calculate_and_plot)
 calculate_btn.grid(row=10, columnspan=2, pady=10)
+
+normal_freq_label = ttk.Label(input_frame, text="", foreground="blue")
+normal_freq_label.grid(row=12, columnspan=2, pady=(10, 0))
 
 error_label = ttk.Label(input_frame, text="", foreground="red")
 error_label.grid(row=11, columnspan=2)
