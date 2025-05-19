@@ -337,15 +337,15 @@
 
 \begin{lstlisting}[language=MyPython,label={lst:lstlisting5}]
     # angles graphic
-    ax1.plot(t, phi1, label='φ₁(t)')
-    ax1.plot(t, phi2, label='φ₂(t)')
+    ax1.plot(t, phi1, label='\phi_2(t)')
+    ax1.plot(t, phi2, label='\phi_2(t)')
     ax1.set_xlabel('t, с')
-    ax1.set_ylabel('φ, рад')
+    ax1.set_ylabel('\phi, рад')
     ax1.legend()
 
     # velocity graphic
-    ax2.plot(t, v1, label='φ̇₁(t)')
-    ax2.plot(t, v2, label='φ̇₂(t)')
+    ax2.plot(t, v1, label='\phi_2^{*}(t)')
+    ax2.plot(t, v2, label='\phi_2^{*}')
     ax2.set_xlabel('t, с')
     ax2.set_ylabel('скорость, рад/с')
     ax2.legend()
