@@ -49,8 +49,8 @@ def calculate_and_plot():
 
         # Создание новых графиков
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6))
-        ax1.plot(t, phi1, label='θ₁(t)')
-        ax1.plot(t, phi2, label='θ₂(t)')
+        ax1.plot(t, phi1, label='φ₁(t)')
+        ax1.plot(t, phi2, label='φ₂(t)')
         ax1.set_xlabel('Время (с)')
         ax1.set_ylabel('Угол (рад)')
         ax1.legend()
