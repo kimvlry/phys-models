@@ -305,17 +305,17 @@
 \end{align*}
 
 \begin{lstlisting}[language=MyPython,label={lst:lstlisting}]
-def system(y, t, m, L, L1, k, beta, g=9.81):
-    phi1, v1, phi2, v2 = y
-    K = k * L1**2 / (m * L**2)      # κ² = k L1² / (m L²)
-    omega0_sq = g / L               # ω₀² = g / L
-    dydt = [
-        v1,
-        -(beta/m)*v1 - (omega0_sq + K)*phi1 + K*phi2,
-        v2,
-        -(beta/m)*v2 - (omega0_sq + K)*phi2 + K*phi1
-    ]
-    return dydt
+    def system(y, t, m, L, L1, k, beta, g=9.81):
+        phi1, v1, phi2, v2 = y
+        K = k * L1**2 / (m * L**2)
+        omega0_sq = g / L
+        dydt = [
+            v1,
+            -(beta/m)*v1 - (omega0_sq + K)*phi1 + K*phi2,
+            v2,
+            -(beta/m)*v2 - (omega0_sq + K)*phi2 + K*phi1
+        ]
+        return dydt
 \end{lstlisting}
 
 \subsection*{4. Численное интегрирование}
